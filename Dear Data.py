@@ -30,7 +30,7 @@ x = [1,2,3,4,5,6,7,8]
 y = [1,2,3,4,5,6,7,8]
 z = [15]
 
-# Add more data points with distinct markers
+# Add more data points with unique markers
 x2 = np.random.rand(10) * 5  # Generate 10 random x values between 0 and 5
 y2 = np.random.rand(10) * 5  # Generate 10 random y values between 0 and 5
 z2 = np.random.rand(10) * 5  # Generate 10 random z values between 0 and 5
@@ -45,11 +45,11 @@ ax.scatter(x, y, z, c='r', marker='o', label='Abstract')
 # Plot the additional data with a blue triangle marker
 ax.scatter(x2, y2, z2, c='b', marker='^', label='Nonabstract')
 
-ax.scatter(x3, y3, z3, c='g', marker='s', label='New Variable')
+ax.scatter(x3, y3, z3, c='g', marker='s', label='Control')
 
 # Customize the 3D plot
-ax.set_xlabel('Abstract')
-ax.set_ylabel('Non Abstract')
+ax.set_xlabel('Amount')
+ax.set_ylabel('Amount')
 ax.set_zlabel('Z Label')
 ax.view_init(elev=20, azim=45)  # Adjust the viewing angle
 
