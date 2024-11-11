@@ -1,0 +1,72 @@
+CREATE TABLE Customerr ( 
+    CustomerID INT NOT NULL Primary Key,
+    CustName VARCHAR(50),
+    CustAddress VARCHAR(250)
+);
+CREATE TABLE CardAccountt (
+     AccountID BIGINT Primary Key,
+     ExpDate DATE,
+     CardType VARCHAR(50),
+     CustomerID INT, 
+     Foreign Key (CustomerID) REFERENCES Customerr(CustomerID)
+);
+CREATE TABLE DebitCard (
+     DAccountID BIGINT Primary Key,
+     BankNo VARCHAR(20),
+     AccountID BIGINT,
+     Foreign Key (AccountID) REFERENCES CardAccountt(AccountID)
+);
+CREATE TABLE CreditCard (
+     CAccountID BIGINT Primary Key,
+     CurrBal DECIMAL(10, 2),
+     AccountID BIGINT,
+     Foreign Key (AccountID) REFERENCES CardAccountt(AccountID)
+);
+CREATE TABLE Merchant (
+     MerchID INT Primary Key,
+     MerchAddr VARCHAR(250)
+);
+CREATE TABLE Charges (
+     MerchID INT,
+     CAccountID BIGINT,
+     ChargeDate DATE,
+     ChargeTime TIME,
+     Amount DECIMAL(10, 2),
+     Primary Key (MerchID, CAccountID, ChargeDate, ChargeTime),
+     Foreign Key (MerchID) REFERENCES Merchant(MerchID),
+     Foreign Key (CAccountID) REFERENCES CreditCard(CAccountID)
+);
+INSERT INTO Customerr (CustomerID, CustName, CustAddress)
+VALUES
+(1001, 'Customer Name 1', 'Address 1'),
+(1002, 'Customer Name 2', 'Address 2'),
+(1003, 'Customer Name 3', 'Address 3'),
+(1004, 'Customer Name 4', 'Address 4'),
+(1005, 'Customer Name 5', 'Address 5'),
+(1006, 'Customer Name 6', 'Address 6'),
+(1007, 'Customer Name 7', 'Address 7');
+
+INSERT INTO CardAccountt (AccountID, ExpDate, CardType, CustomerID)
+VALUES
+(8541236970, '2027-02-13', 'credit', 1001),
+(8541354181, '2025-12-10', 'credit', 1002),
+(8542983547, '2027-11-05', 'debit', 1003),
+(8542145639, '2024-12-24', 'debit', 1004),
+(8541325873, '2028-03-20', 'credit', 1005),
+(8542365472, '2026-05-16', 'debit', 1006),
+(8541874532, '2029-10-31', 'credit', 1007);
+
+SELECT * 
+FROM CardAccountt
+WHERE CardType = 'credit';
+
+SELECT * 
+FROM CardAccountt
+WHERE ExpDate BETWEEN '2024-01-01' AND '2025-12-31';
+
+SET SQL_SAFE_UPDATES = 0;
+
+
+
+
+	
