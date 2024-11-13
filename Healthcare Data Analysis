@@ -1,0 +1,35 @@
+SELECT patient_id, first_name, last_name, treatment, year(visit_date) as year, responsive_physician
+FROM patient_records
+WHERE 
+gender = 'Male'
+AND treatment = 'Surgery'
+AND year(visit_date) = 2024;
+
+
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE patient_records
+SET treatment = 'X-ray'
+WHERE patient_id = 62764
+AND treatment = 'Check-up';
+
+
+SELECT 
+    SUM(bill_amount) AS total_treatment_cost
+FROM 
+    patient_records
+WHERE 
+    month(visit_date) = 11
+    AND year(visit_date) = 2024;
+
+
+SELECT
+   treatment, COUNT(DISTINCT patient_id) AS total_patients
+FROM 
+   patient_records
+GROUP BY
+   treatment;
+   
+
+
+
