@@ -1,0 +1,53 @@
+
+SELECT
+c.FirstName, c.LastName, c.City,
+SUM(oo.Total_Price) AS TotalOrderPrice
+FROM
+Customers AS c
+INNER JOIN
+Online_Orders AS oo ON c.CustomerID = oo.CustomerID
+GROUP BY
+c.CustomerID, c.FirstName, c.LastName, c.City;
+
+SELECT
+CustomerID,
+SUM(Total_Price) AS TotalAmountSpent
+FROM
+(
+SELECT CustomerID, Total_Price
+FROM Online_Orders
+UNION ALL
+SELECT CustomerID, `Total Price`
+FROM Orders
+) AS combined_orders
+GROUP BY
+CustomerID;
+
+CREATE TABLE All_Orders AS
+SELECT
+CustomerID, OrderID, Order_date, Item1ID, Item1Qty, Item1Price, Item2ID,
+Item2Qty, Item2Price, Item3ID, Item3Qty, Item3Price, Total_Price
+FROM
+Online_Orders
+UNION ALL
+SELECT
+CustomerID, OrderID, Order_date, Item1ID, Item1Qty, Item1Price, Item2ID,
+Item2Qty, Item2Price, Item3ID, Item3Qty, Item3Price, `Total Price` AS Total_Price
+FROM
+Orders;
+SELECT *
+INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/All_Orders.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+FROM All_Orders;
+SHOW VARIABLES LIKE 'secure_file_priv';
+SELECT *
+FROM all_orders
+
+SELECT
+OrderID, CustomerID, `Total Price` AS Total_Price
+FROM
+Orders
+WHERE
+Order_date BETWEEN '2023-01-01' AND '2023-06-30';
