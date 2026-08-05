@@ -1,8 +1,20 @@
--- Customer Data Analysis Project
--- Objective: Analyze customer purchasing behavior by combining online and in-store order data
--- to identify spending patterns, revenue trends, and high-value customers.
 
--- 1. Create a combined orders table from online and in-store transactions
+   # Customer Data Analysis Project
+# SQL + Python + Pandas
+#
+# Objective:
+# Combine customer transaction data, analyze purchasing behavior,
+# identify spending patterns, and visualize revenue trends.
+
+
+# ==============================
+# SQL ANALYSIS
+# ==============================
+
+"""
+SQL Queries Used:
+
+-- Combine online and in-store transactions
 
 CREATE TABLE All_Orders AS
 SELECT
@@ -40,7 +52,7 @@ SELECT
 FROM Orders;
 
 
--- 2. Analyze total spending by customer
+-- Analyze customer spending
 
 SELECT
     c.CustomerID,
@@ -48,8 +60,8 @@ SELECT
     c.LastName,
     c.City,
     SUM(o.Total_Price) AS Total_Spending
-FROM Customers AS c
-INNER JOIN All_Orders AS o
+FROM Customers c
+INNER JOIN All_Orders o
     ON c.CustomerID = o.CustomerID
 GROUP BY
     c.CustomerID,
@@ -59,7 +71,7 @@ GROUP BY
 ORDER BY Total_Spending DESC;
 
 
--- 3. Identify top customers by lifetime spending
+-- Identify top customers
 
 SELECT
     CustomerID,
@@ -68,20 +80,71 @@ FROM All_Orders
 GROUP BY CustomerID
 ORDER BY Lifetime_Value DESC
 LIMIT 10;
+"""
 
 
--- 4. Analyze monthly revenue trends
+# ==============================
+# PYTHON / PANDAS ANALYSIS
+# ==============================
 
-SELECT
-    DATE_FORMAT(Order_date, '%Y-%m') AS Month,
-    SUM(Total_Price) AS Monthly_Revenue
-FROM All_Orders
-WHERE Order_date BETWEEN '2023-01-01' AND '2023-06-30'
-GROUP BY Month
-ORDER BY Month;
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
--- 5. Export combined dataset for visualization
+# Load SQL exported dataset
+orders = pd.read_csv("All_Orders.csv")
 
-SELECT *
-FROM All_Orders;
+
+# Review dataset
+print(orders.head())
+print(orders.info())
+
+
+# Convert dates
+orders["Order_date"] = pd.to_datetime(orders["Order_date"])
+
+
+# Customer spending analysis
+customer_spending = (
+    orders.groupby("CustomerID")["Total_Price"]
+    .sum()
+    .sort_values(ascending=False)
+)
+
+print("\nTop Customers:")
+print(customer_spending.head(10))
+
+
+# Monthly revenue analysis
+monthly_revenue = (
+    orders.groupby(
+        orders["Order_date"].dt.to_period("M")
+    )["Total_Price"]
+    .sum()
+)
+
+print("\nMonthly Revenue:")
+print(monthly_revenue)
+
+
+# Revenue visualization
+monthly_revenue.plot(
+    kind="line",
+    marker="o",
+    title="Monthly Revenue Trends"
+)
+
+plt.xlabel("Month")
+plt.ylabel("Revenue")
+plt.xticks(rotation=45)
+
+plt.tight_layout()
+plt.show()
+
+
+# Export results
+customer_spending.to_csv(
+    "customer_spending_analysis.csv"
+)
+
+print("Analysis complete.")
