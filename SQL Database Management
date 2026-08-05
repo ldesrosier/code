@@ -1,71 +1,124 @@
-CREATE TABLE Customer ( 
-    CustomerID INT NOT NULL Primary Key,
+-- Customer Credit Card Database Analysis
+-- Objective: Design a relational database and analyze customer account information
+-- including card types, account status, and transaction activity.
+
+-- 1. Create Customer Table
+
+CREATE TABLE Customer (
+    CustomerID INT NOT NULL PRIMARY KEY,
     CustName VARCHAR(50),
     CustAddress VARCHAR(250)
 );
+
+
+-- 2. Create Card Account Table
+
 CREATE TABLE CardAccount (
-     AccountID BIGINT Primary Key,
-     ExpDate DATE,
-     CardType VARCHAR(50),
-     CustomerID INT, 
-     Foreign Key (CustomerID) REFERENCES Customer(CustomerID)
+    AccountID BIGINT PRIMARY KEY,
+    ExpDate DATE,
+    CardType VARCHAR(50),
+    CustomerID INT,
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
 );
+
+
+-- 3. Create Debit Card Table
+
 CREATE TABLE DebitCard (
-     DAccountID BIGINT Primary Key,
-     BankNo VARCHAR(20),
-     AccountID BIGINT,
-     Foreign Key (AccountID) REFERENCES CardAccount(AccountID)
+    DAccountID BIGINT PRIMARY KEY,
+    BankNo VARCHAR(20),
+    AccountID BIGINT,
+    FOREIGN KEY (AccountID) REFERENCES CardAccount(AccountID)
 );
+
+
+-- 4. Create Credit Card Table
+
 CREATE TABLE CreditCard (
-     CAccountID BIGINT Primary Key,
-     CurrBal DECIMAL(10, 2),
-     AccountID BIGINT,
-     Foreign Key (AccountID) REFERENCES CardAccount(AccountID)
+    CAccountID BIGINT PRIMARY KEY,
+    CurrBal DECIMAL(10,2),
+    AccountID BIGINT,
+    FOREIGN KEY (AccountID) REFERENCES CardAccount(AccountID)
 );
+
+
+-- 5. Create Merchant Table
+
 CREATE TABLE Merchant (
-     MerchID INT Primary Key,
-     MerchAddr VARCHAR(250)
+    MerchID INT PRIMARY KEY,
+    MerchAddr VARCHAR(250)
 );
+
+
+-- 6. Create Transaction Charges Table
+
 CREATE TABLE Charges (
-     MerchID INT,
-     CAccountID BIGINT,
-     ChargeDate DATE,
-     ChargeTime TIME,
-     Amount DECIMAL(10, 2),
-     Primary Key (MerchID, CAccountID, ChargeDate, ChargeTime),
-     Foreign Key (MerchID) REFERENCES Merchant(MerchID),
-     Foreign Key (CAccountID) REFERENCES CreditCard(CAccountID)
+    MerchID INT,
+    CAccountID BIGINT,
+    ChargeDate DATE,
+    ChargeTime TIME,
+    Amount DECIMAL(10,2),
+    PRIMARY KEY (MerchID, CAccountID, ChargeDate, ChargeTime),
+    FOREIGN KEY (MerchID) REFERENCES Merchant(MerchID),
+    FOREIGN KEY (CAccountID) REFERENCES CreditCard(CAccountID)
 );
-INSERT INTO Customer (CustomerID, CustName, CustAddress)
-VALUES
-(1001, 'Customer Name 1', 'Address 1'),
-(1002, 'Customer Name 2', 'Address 2'),
-(1003, 'Customer Name 3', 'Address 3'),
-(1004, 'Customer Name 4', 'Address 4'),
-(1005, 'Customer Name 5', 'Address 5'),
-(1006, 'Customer Name 6', 'Address 6'),
-(1007, 'Customer Name 7', 'Address 7');
 
-INSERT INTO CardAccount (AccountID, ExpDate, CardType, CustomerID)
-VALUES
-(8541236970, '2027-02-13', 'credit', 1001),
-(8541354181, '2025-12-10', 'credit', 1002),
-(8542983547, '2027-11-05', 'debit', 1003),
-(8542145639, '2024-12-24', 'debit', 1004),
-(8541325873, '2028-03-20', 'credit', 1005),
-(8542365472, '2026-05-16', 'debit', 1006),
-(8541874532, '2029-10-31', 'credit', 1007);
 
-SELECT * 
+-- ANALYSIS QUERIES
+
+
+-- 1. View all credit card accounts
+
+SELECT *
 FROM CardAccount
 WHERE CardType = 'credit';
 
-SELECT * 
+
+-- 2. Identify accounts expiring within a specific timeframe
+
+SELECT
+    AccountID,
+    CardType,
+    ExpDate
 FROM CardAccount
 WHERE ExpDate BETWEEN '2024-01-01' AND '2025-12-31';
 
-SET SQL_SAFE_UPDATES = 0;
 
+-- 3. Analyze customer account information
+
+SELECT
+    c.CustomerID,
+    c.CustName,
+    ca.AccountID,
+    ca.CardType,
+    ca.ExpDate
+FROM Customer c
+INNER JOIN CardAccount ca
+    ON c.CustomerID = ca.CustomerID;
+
+
+-- 4. Analyze total spending by credit card customer
+
+SELECT
+    ca.CustomerID,
+    SUM(ch.Amount) AS Total_Spending
+FROM CardAccount ca
+INNER JOIN CreditCard cc
+    ON ca.AccountID = cc.AccountID
+INNER JOIN Charges ch
+    ON cc.CAccountID = ch.CAccountID
+GROUP BY ca.CustomerID
+ORDER BY Total_Spending DESC;
+
+
+-- 5. Identify highest spending merchants
+
+SELECT
+    MerchID,
+    SUM(Amount) AS Total_Revenue
+FROM Charges
+GROUP BY MerchID
+ORDER BY Total_Revenue DESC;
 
 
 
